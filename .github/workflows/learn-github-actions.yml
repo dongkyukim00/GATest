@@ -6,7 +6,22 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
+        name: Installing Bats
         with:
           node-version: '14'
       - run: npm install -g bats
       - run: bats -v
+
+      - uses: dorny/paths-filter@v2
+        name: Operation on File Change
+        id: changes
+        with:
+          filters: |
+            src:
+              - 'TestDir1/**'
+
+        # run only if some file in 'TestDir1' folder was changed
+      - if: steps.changes.outputs.src == 'true'
+        run: |
+          cat myfile.txt
+          echo "append this text" >> myfile.txt
